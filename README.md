@@ -141,6 +141,12 @@ python confere_com_tse.py amostra_tse/SP     # uma pasta por UF
 - **Fonte pode mudar:** os SHA-256 dos zips do TSE ficam registrados em `saida/zips/` e `resultados/oficial.sha256`, mas os scripts não interrompem a execução se um arquivo mudar. A comparação com os hashes registrados é manual.
 - **Casos investigados:** a inspeção manual das 10 seções baixou os arquivos de cada seção direto do zip do TSE. Esse passo não tem script no repositório.
 - **Cargos extras:** o BU também traz uma eleição para prefeito e uma consulta popular em MT, realizadas no mesmo dia. O resultado oficial por seção usado não cobre esses cargos, então eles aparecem nos totais, mas não são conferidos.
+- **Contagem do log:** `processa.py` soma as linhas "O voto do eleitor foi computado" de todos os logs do pacote de cada seção, inclusive os aninhados. Isso é necessário para contar os votos de urnas substituídas durante a votação. Em 3 pacotes do TSE, porém, há logs que não deveriam ser somados:
+  - em ES, o log de outra seção (+304);
+  - em BA, uma cópia duplicada do log (+185);
+  - em MG, um log que repete parte de outro (+46).
+
+  São 535 votos a mais. No sentido contrário, faltam no log 322 votos que estão no BU: uma seção de SP sem log, urnas substituídas sem o log do dia e reinícios logo após um voto. Por isso, o total da tabela de horários fica 213 acima do comparecimento dos BUs. Os 535 a mais poderiam ser removidos com duas regras: contar uma só vez as linhas idênticas e ignorar logs de outra seção. Não as aplicamos, para manter a extração literal e deixar a falha dos pacotes visível. O efeito é de 0,0004% nas faixas antes das 17h e nenhum a partir das 17h. Os casos estão em [casos_investigados.md](resultados/casos_investigados.md).
 - **Exterior em cédula:** nas 29 seções do exterior apuradas em cédula (Sistema de Apuração), não há comparecimento nem votos no log para comparar.
 - **RDV:** o RDV é baixado e tem hash e assinatura conferidos, mas ainda não é recontado.
 
