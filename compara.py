@@ -31,9 +31,9 @@ import assinatura
 OFICIAL = "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2026_{}.zip"
 PADRAO_UF = {"AC": -2, "AM": -1, "RO": -1, "RR": -1, "MT": -1, "MS": -1}  # Decreto 2.784/1913 (Lei 12.876/2013)
 CODIGOS = {"95": "BRANCO", "96": "NULO"}  # NR_VOTAVEL nos arquivos oficiais
-# Faixas de horário em Brasília [início, fim)
-FAIXAS = [("antes das 8h", -99, 8), ("8h–12h", 8, 12), ("12h–17h", 12, 17), ("17h–18h", 17, 18),
-          ("18h–19h", 18, 19), ("a partir das 19h", 19, 99)]
+# Faixas de horário em Brasília [início, fim): de hora em hora e agrupadas
+FAIXAS = ([("antes das 8h", -99, 8)] + [(f"{h}h–{h + 1}h", h, h + 1) for h in range(8, 19)]
+          + [("a partir das 19h", 19, 99), ("8h–12h", 8, 12), ("12h–17h", 12, 17), ("a partir das 17h", 17, 99)])
 DIA = "20261025"
 CARGOS = ("PRESIDENTE", "GOVERNADOR")  # os cargos do resultado oficial por seção
 TODAS_UFS = "AC AL AM AP BA CE DF ES GO MA MG MS MT PA PB PE PI PR RJ RN RO RR RS SC SE SP TO ZZ".split()
@@ -221,11 +221,9 @@ def main():
                 c["a19"] += a19
                 c["secoes_a17"] += a17 > 0
                 c["secoes_a19"] += a19 > 0
-            por_faixa = Counter()
-            for h, n in enumerate(hora):
-                por_faixa[next(nm for nm, ini, fim in FAIXAS if ini <= h - fz < fim)] += n
-            por_faixa["a partir das 17h"] = por_faixa["17h–18h"] + por_faixa["18h–19h"] + por_faixa["a partir das 19h"]
-            for nome, n in por_faixa.items():
+            brasilia = {h - fz: n for h, n in enumerate(hora)}
+            for nome, ini, fim in FAIXAS:
+                n = sum(v for h, v in brasilia.items() if ini <= h < fim)
                 faixa[nome]["votos"] += n
                 faixa[nome]["secoes"] += n > 0
 
@@ -258,13 +256,12 @@ def main():
                "|---|---|---|---|---|---|---|"]
     for uf, c in sorted(por_uf.items()) + [("**Total**", total)]:
         linhas.append(f"| {uf} | {c['secoes']} | {c['votos']} | {c['a17']} | {c['secoes_a17']} | {c['a19']} | {c['secoes_a19']} |")
-    nomes_faixas = [nm for nm, _, _ in FAIXAS] + ["a partir das 17h"]
     linhas += ["", "## Votos por faixa de horário (Brasília, sem exterior)", "",
                "| faixa | votos | % dos votos do dia | seções com voto na faixa |", "|---|---|---|---|"]
     with open("resultados/votos_por_faixa.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["faixa_brasilia", "votos", "pct_dos_votos_do_dia", "secoes_com_voto_na_faixa"])
-        for nome in nomes_faixas:
+        for nome, _, _ in FAIXAS:
             c = faixa[nome]
             pct = 100 * c["votos"] / total["votos"]
             w.writerow([nome, c["votos"], f"{pct:.4f}", c["secoes"]])

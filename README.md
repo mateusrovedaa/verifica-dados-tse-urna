@@ -45,20 +45,36 @@ governador, o mesmo número do resultado oficial, e cada candidato também confe
 [`resultados/resumo.md`](resultados/resumo.md)). Como a comparação é feita seção por seção, os totais por UF
 e por município também batem.
 
-### Votos por horário (Brasília, só Brasil)
+### Votos por hora (Brasília, só Brasil)
 
 | horário | votos | % dos votos do dia | seções com voto no horário |
 |---|---:|---:|---:|
-| 8h às 12h | 76.971.693 | 60,20% | 497.895 |
-| 12h às 17h | 50.848.286 | 39,77% | 497.770 |
+| 8h às 9h | 21.418.439 | 16,75% | 497.745 |
+| 9h às 10h | 19.965.850 | 15,62% | 497.787 |
+| 10h às 11h | 19.228.033 | 15,04% | 497.758 |
+| 11h às 12h | 16.359.371 | 12,80% | 497.662 |
+| 12h às 13h | 12.836.554 | 10,04% | 497.321 |
+| 13h às 14h | 11.080.373 | 8,67% | 497.443 |
+| 14h às 15h | 10.568.535 | 8,27% | 497.465 |
+| 15h às 16h | 9.740.596 | 7,62% | 497.338 |
+| 16h às 17h | 6.622.228 | 5,18% | 496.338 |
 | 17h às 18h | 32.337 | 0,025% | 28.783 |
 | 18h às 19h | 1.982 | 0,002% | 1.662 |
-| **17h em diante¹** | **34.330** | **0,027%** | **29.854** |
+| depois das 19h | 11 | 0,00001% | 11 |
+| **Total** | **127.854.309** | **100%** | **497.897** |
+
+### Votos por faixa (Brasília, só Brasil)
+
+| faixa | votos | % dos votos do dia | seções com voto na faixa |
+|---|---:|---:|---:|
+| 8h às 12h | 76.971.693 | 60,20% | 497.895 |
+| 12h às 17h | 50.848.286 | 39,77% | 497.770 |
+| 17h às 19h¹ | 34.330 | 0,027% | 29.854 |
 | **Total** | **127.854.309** | **100%** | **497.897** |
 
 ¹ Inclui 11 votos depois das 19h: um em cada uma de 11 seções, na BA (2), no RJ (4) e em SP (5).
 
-A tabela conta as linhas "O voto do eleitor foi computado" do log, porque só o log registra a hora de cada
+As tabelas contam as linhas "O voto do eleitor foi computado" do log, porque só o log registra a hora de cada
 voto (com hora, minuto e segundo). O total fica 322 votos (0,0003%) abaixo do comparecimento dos BUs, por causa das 7 seções com log incompleto descritas nas [limitações](#limitações). A urna grava a hora local, que convertemos para
 Brasília pelo fuso do município. O exterior fica de fora porque lá a urna marca a hora de cada país. O voto
 é secreto e o log não diz em quem foi cada voto, por isso não há divisão por candidato em cada horário.
