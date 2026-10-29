@@ -2,7 +2,8 @@
 
 O que é conferido, seguindo o código de referência do TSE (formato-arquivos-bu-rdv-ass-digital-v2.zip,
 python/assinatura_hash.py e python/lib/mr_util.py):
-  1. o certificado da urna foi assinado por uma das ACs do TSE (pasta acs/);
+  1. o certificado da urna foi assinado por uma das ACs do TSE (pasta acs/), e o emissor nele
+     declarado é essa AC; a validade (início e fim) do certificado é devolvida para conferência;
   2. para cada arquivo listado na assinatura de hardware: SHA-512 do arquivo == hash registrado, e
      a assinatura da urna sobre SHA-512(hash) é válida com a chave do certificado.
 A assinatura de software (algoritmo CEPESC) não é pública: dela só conferimos os hashes.
@@ -26,10 +27,14 @@ import base64, hashlib, os
 def elemento(b, i):
     """Lê o elemento DER que começa em b[i]."""
     tag, n, ini = b[i], b[i + 1], i + 2
+    if n == 0x80:
+        raise ValueError("comprimento indefinido não é DER")
     if n & 0x80:  # comprimento longo: os próximos (n & 0x7f) bytes dão o tamanho
         k = n & 0x7F
         n = int.from_bytes(b[ini:ini + k], "big")
         ini += k
+    if ini + n > len(b):
+        raise ValueError("elemento passa do fim do arquivo")
     return tag, i, ini, ini + n
 
 
@@ -105,6 +110,13 @@ def ed_decodifica(e):
     return (P - x if x & 1 != sinal else x), y, 1
 
 
+def ed_no_subgrupo(chave):
+    """A chave pública é um ponto da curva de ordem ED_N (exclui pontos de ordem pequena).
+    Com A nesse subgrupo, a equação de ed521_verifica força R também nele."""
+    A = ed_decodifica(chave)
+    return A is not None and not ed_igual(A, (0, 1, 1)) and ed_igual(mult(ED_N, A, ed_soma, (0, 1, 1)), (0, 1, 1))
+
+
 def ed521_verifica(chave, msg, assinatura):
     """Ed521: válida se S·G == R + H(R, A, msg)·A."""
     if len(assinatura) != 132:
@@ -165,26 +177,31 @@ def verifica(alg, chave, m, assinatura):
 OID_ED521 = bytes.fromhex("2b0601040182dc2c0201")  # 1.3.6.1.4.1.44588.2.1 em DER
 
 
+def data(der, e):
+    """UTCTime (AAMMDD...) ou GeneralizedTime (AAAAMMDD...) -> 'AAAAMMDD'."""
+    t = valor(der, e).decode()
+    return ("20" + t[:6]) if e[0] == 0x17 else t[:8]
+
+
 def le_certificado(der):
-    """Certificate ::= SEQUENCE { tbs, algoritmo, assinatura }.
-    Devolve (bytes do TBS, algoritmo da chave, chave pública, assinatura do emissor)."""
+    """Certificate ::= SEQUENCE { tbs, algoritmo, assinatura }; o TBS tem
+    [0] version (opcional), serial, algoritmo, emissor, validade, titular, chave pública.
+    Devolve dict com tbs (bytes), alg, chave, sig (do emissor), emissor, titular, inicio e fim ('AAAAMMDD')."""
     tbs, _, sig = filhos(der, elemento(der, 0))
     campos = filhos(der, tbs)
-    spki = campos[6] if campos[0][0] == 0xA0 else campos[5]  # [0] version é opcional
+    _, _, emissor, validade, titular, spki = campos[-6:] if campos[0][0] != 0xA0 else campos[1:7]
     alg, chave = filhos(der, spki)
-    alg = "ed521" if OID_ED521 in valor(der, alg) else "ecdsa"
+    inicio, fim = (data(der, e) for e in filhos(der, validade))
     # BIT STRING: o 1º byte é o nº de bits não usados (0); o resto é o valor
-    return der[tbs[1]:tbs[3]], alg, valor(der, chave)[1:], valor(der, sig)[1:]
+    return {"tbs": der[tbs[1]:tbs[3]], "alg": "ed521" if OID_ED521 in valor(der, alg) else "ecdsa",
+            "chave": valor(der, chave)[1:], "sig": valor(der, sig)[1:],
+            "emissor": der[emissor[1]:emissor[3]], "titular": der[titular[1]:titular[3]], "inicio": inicio, "fim": fim}
 
 
 def carrega_acs(pasta=os.path.join(os.path.dirname(os.path.abspath(__file__)), "acs")):
-    """Chaves das ACs do TSE: {nome: (algoritmo, chave)}."""
-    acs = {}
-    for nome in sorted(os.listdir(pasta)):
-        if nome.endswith(".der"):
-            _, alg, chave, _ = le_certificado(open(os.path.join(pasta, nome), "rb").read())
-            acs[nome.removesuffix(".der")] = (alg, chave)
-    return acs
+    """Certificados das ACs do TSE: {nome: le_certificado(...)}."""
+    return {nome.removesuffix(".der"): le_certificado(open(os.path.join(pasta, nome), "rb").read())
+            for nome in sorted(os.listdir(pasta)) if nome.endswith(".der")}
 
 # ---------- arquivo de assinatura da urna ----------
 
@@ -216,7 +233,8 @@ def verifica_vsc(vsc, arquivos_da_secao, acs):
     """Confere a assinatura de uma seção.
 
     arquivos_da_secao: {nome do arquivo: bytes} com os arquivos publicados.
-    Devolve: modelo da urna, ac (qual AC do TSE assinou o certificado da urna, ou "INVALIDO") e listas de nomes:
+    Devolve: modelo da urna, ac (qual AC do TSE emitiu e assinou o certificado da urna, ou "INVALIDO"),
+    cert_inicio e cert_fim (validade do certificado da urna, 'AAAAMMDD') e listas de nomes:
       ausentes (assinados mas não publicados pelo TSE), hash_falha, assinatura_falha (HW), sw_hash_falha.
     """
     sw, hw, fim = filhos(vsc, elemento(vsc, 0))
@@ -225,12 +243,16 @@ def verifica_vsc(vsc, arquivos_da_secao, acs):
     sw_arqs, sw_hash, sw_lista, _ = le_entidade(vsc, sw)
     if cert.startswith(b"-----BEGIN"):  # UE2020/UE2022 trazem o certificado em PEM
         cert = base64.b64decode(b"".join(l for l in cert.splitlines() if not l.startswith(b"-----")))
-    tbs, alg, chave, sig_emissor = le_certificado(cert)
-    m = tbs if alg == "ed521" else hashlib.sha512(tbs).digest()  # mr_util.valida_certificado
-    ac = next((nome for nome, (alg_ac, chave_ac) in acs.items()
-               if alg_ac == alg and verifica(alg_ac, chave_ac, m, sig_emissor)), "INVALIDO")
+    c = le_certificado(cert)
+    alg, chave = c["alg"], c["chave"]
+    m = c["tbs"] if alg == "ed521" else hashlib.sha512(c["tbs"]).digest()  # mr_util.valida_certificado
+    ac = next((nome for nome, a in acs.items()
+               if a["alg"] == alg and a["titular"] == c["emissor"] and verifica(alg, a["chave"], m, c["sig"])), "INVALIDO")
+    if alg == "ed521" and not ed_no_subgrupo(chave):
+        ac = "INVALIDO"
 
-    r = {"modelo": modelo, "ac": ac, "ausentes": [], "hash_falha": [], "assinatura_falha": [], "sw_hash_falha": []}
+    r = {"modelo": modelo, "ac": ac, "cert_inicio": c["inicio"], "cert_fim": c["fim"],
+         "ausentes": [], "hash_falha": [], "assinatura_falha": [], "sw_hash_falha": []}
     if hashlib.sha512(hw_lista).digest() != hw_hash:
         r["hash_falha"].append("(lista HW)")
     if hashlib.sha512(sw_lista).digest() != sw_hash:

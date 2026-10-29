@@ -1,1 +1,2 @@
-145 seções conferidas com o código do TSE, 0 divergências
+vetores: 20 Ed521 (ECPy) e 20 ECDSA P-521 (OpenSSL) aceitos; adulterações recusadas
+145 seções conferidas com o código do TSE (assinatura e RDV), 0 divergências

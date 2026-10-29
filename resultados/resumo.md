@@ -5,6 +5,10 @@
 - Seções no resultado oficial: 499205
 - Cargos sem resultado oficial por seção nos arquivos usados (não conferidos): DESMEMBRAMENTO DE NOVA POXORÉU, PREFEITO
 - Municípios com fuso diferente do padrão da UF: 12 (ver fusos_municipios.csv)
+- Seções com RDV recontado: 499205
+- Seções com certificado de urna emitido pela acue2020: 200504
+- Seções com certificado de urna emitido pela acue2022: 198746
+- Seções com certificado de urna emitido pela acurna: 99957
 
 ## Divergências
 
@@ -12,7 +16,7 @@
 |---|---|
 | problemas | 30 |
 | BU inconsistente | 27 |
-| votos no log diferente do comparecimento no BU | 10 |
+| votos no log diferente do comparecimento no BU | 7 |
 | BU publicado sem seção no resultado oficial | 2 |
 
 ## Votos por horário (Brasília, sem exterior)
@@ -23,13 +27,13 @@
 | AL | 7101 | 1951632 | 646 | 552 | 0 | 0 |
 | AM | 8157 | 2192059 | 1004 | 879 | 0 | 0 |
 | AP | 1914 | 429975 | 142 | 131 | 0 | 0 |
-| BA | 35476 | 9422218 | 4190 | 3449 | 2 | 2 |
+| BA | 35476 | 9422033 | 4190 | 3449 | 2 | 2 |
 | CE | 23765 | 6024843 | 1074 | 960 | 0 | 0 |
 | DF | 6969 | 1868280 | 980 | 876 | 0 | 0 |
-| ES | 9844 | 2409518 | 294 | 269 | 0 | 0 |
+| ES | 9844 | 2409214 | 294 | 269 | 0 | 0 |
 | GO | 15686 | 4047280 | 734 | 643 | 0 | 0 |
 | MA | 18093 | 4127735 | 921 | 828 | 0 | 0 |
-| MG | 52062 | 13044249 | 2253 | 2084 | 0 | 0 |
+| MG | 52062 | 13044203 | 2253 | 2084 | 0 | 0 |
 | MS | 7106 | 1594460 | 422 | 388 | 0 | 0 |
 | MT | 8287 | 2085334 | 909 | 797 | 0 | 0 |
 | PA | 20827 | 4989573 | 1308 | 1173 | 0 | 0 |
@@ -46,15 +50,15 @@
 | SE | 5923 | 1466659 | 287 | 264 | 0 | 0 |
 | SP | 103656 | 27364121 | 8860 | 7574 | 5 | 5 |
 | TO | 4384 | 954763 | 223 | 203 | 0 | 0 |
-| **Total** | 497897 | 127854844 | 34330 | 29854 | 11 | 11 |
+| **Total** | 497897 | 127854309 | 34330 | 29854 | 11 | 11 |
 
 ## Votos por faixa de horário (Brasília, sem exterior)
 
 | faixa | votos | % dos votos do dia | seções com voto na faixa |
 |---|---|---|---|
 | antes das 8h | 0 | 0.000% | 0 |
-| 8h–12h | 76972075 | 60.203% | 497895 |
-| 12h–17h | 50848439 | 39.770% | 497770 |
+| 8h–12h | 76971693 | 60.203% | 497895 |
+| 12h–17h | 50848286 | 39.770% | 497770 |
 | 17h–18h | 32337 | 0.025% | 28783 |
 | 18h–19h | 1982 | 0.002% | 1662 |
 | a partir das 19h | 11 | 0.000% | 11 |

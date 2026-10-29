@@ -1,8 +1,9 @@
 """Compara os fatos extraídos por processa.py entre si e com o resultado oficial publicado pelo TSE.
 
-Entradas: saida/secoes/*.csv e saida/votos/*.csv (de processa.py); resultado oficial por seção do TSE
+Entradas: saida/secoes, saida/votos e saida/rdv (de processa.py); resultado oficial por seção do TSE
 (votacao_secao_2026_BR.zip para presidente, votacao_secao_2026_<UF>.zip para governador), baixado para
-oficial/ com o SHA-256 registrado em resultados/oficial.sha256.
+oficial/ com o SHA-256 registrado em resultados/oficial.sha256. Se hashes_tse/oficial.sha256 existir,
+cada arquivo baixado precisa ter o SHA-256 registrado nele, senão o script para.
 
 Saídas em resultados/:
   divergencias.csv       uma linha por problema encontrado (seção, tipo, detalhe)
@@ -21,8 +22,11 @@ Regras de horário (todas aqui, para poderem ser revistas):
     encerramento ainda vota, então votos pouco depois do limite são esperados.
   - Exterior (ZZ): votação em horário local de cada país; não convertemos para Brasília.
 """
-import csv, glob, hashlib, io, os, subprocess, zipfile
+import csv, glob, hashlib, io, os, subprocess, sys, zipfile
 from collections import Counter, defaultdict
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import assinatura
 
 OFICIAL = "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2026_{}.zip"
 PADRAO_UF = {"AC": -2, "AM": -1, "RO": -1, "RR": -1, "MT": -1, "MS": -1}  # Decreto 2.784/1913 (Lei 12.876/2013)
@@ -30,6 +34,8 @@ CODIGOS = {"95": "BRANCO", "96": "NULO"}  # NR_VOTAVEL nos arquivos oficiais
 # Faixas de horário em Brasília [início, fim)
 FAIXAS = [("antes das 8h", -99, 8), ("8h–12h", 8, 12), ("12h–17h", 12, 17), ("17h–18h", 17, 18),
           ("18h–19h", 18, 19), ("a partir das 19h", 19, 99)]
+DIA = "20261025"
+CARGOS = ("PRESIDENTE", "GOVERNADOR")  # os cargos do resultado oficial por seção
 TODAS_UFS = "AC AL AM AP BA CE DF ES GO MA MG MS MT PA PB PE PI PR RJ RN RO RR RS SC SE SP TO ZZ".split()
 
 
@@ -94,6 +100,9 @@ def main():
     for s in secoes:
         if s["ac_certificado"] == "INVALIDO":
             div.append((s["uf"], s["secao"], "certificado da urna não emitido pelas ACs do TSE", s["modelo_urna"]))
+        if s["cert_inicio"] and not s["cert_inicio"] <= DIA <= s["cert_fim"]:
+            div.append((s["uf"], s["secao"], "certificado da urna fora da validade em 25/10/2026",
+                        f"{s['cert_inicio']}-{s['cert_fim']}"))
         for col in ("hash_falha", "assinatura_falha", "sw_hash_falha", "problemas"):
             if s[col]:
                 div.append((s["uf"], s["secao"], col, s[col]))
@@ -129,13 +138,29 @@ def main():
             div.append((secao[6:8].upper(), secao, "BU inconsistente",
                         f"{cargo}: soma={soma} apurado={total} comparecimento={comparecimento[secao]}"))
 
+    # 3b. RDV x BU: os votos recontados um a um no RDV devem dar os totais do BU
+    rdv = defaultdict(Counter)
+    for v in ler("saida/rdv/*.csv"):
+        rdv[chave_secao(v["secao"])][(v["cargo"], v["numero"])] += int(v["votos"])
+    for k in rdv:
+        for item in sorted(i for i in set(rdv[k]) | set(bu[k]) if i[0] in CARGOS):
+            if rdv[k][item] != bu[k][item]:
+                div.append((k[0], nome_secao_bu.get(k, ""), "RDV diferente do BU",
+                            f"{item[0]} {item[1]}: rdv={rdv[k][item]} bu={bu[k][item]}"))
+
     # 4. BU x resultado oficial publicado pelo TSE
+    esperados = {}
+    if os.path.exists("hashes_tse/oficial.sha256"):
+        esperados = {l.split()[1]: l.split()[0] for l in open("hashes_tse/oficial.sha256") if l.strip()}
     oficial = defaultdict(Counter)
     with open("resultados/oficial.sha256", "w") as f:
         for nome in ["BR"] + [u for u in ufs if u != "ZZ"]:
             path = baixa_oficial(nome)
             with open(path, "rb") as z:
-                f.write(f"{hashlib.file_digest(z, 'sha256').hexdigest()}  {os.path.basename(path)}  {OFICIAL.format(nome)}\n")
+                h = hashlib.file_digest(z, "sha256").hexdigest()
+            if esperados.get(os.path.basename(path), h) != h:
+                sys.exit(f"{path} tem SHA-256 {h}, diferente do registrado em hashes_tse/oficial.sha256")
+            f.write(f"{h}  {os.path.basename(path)}  {OFICIAL.format(nome)}\n")
             for k, votos in votos_oficiais(path).items():
                 if k[0] in ufs:  # o arquivo BR traz todas as UFs; compara só as processadas
                     oficial[k].update(votos)
@@ -223,6 +248,9 @@ def main():
               f"- Cargos sem resultado oficial por seção nos arquivos usados (não conferidos): "
               f"{', '.join(sorted({c for c, _ in totais_bu} - cargos_oficiais)) or 'nenhum'}",
               f"- Municípios com fuso diferente do padrão da UF: {sum(1 for k in fuso if fuso[k] != PADRAO_UF.get(k[0], 0))} (ver fusos_municipios.csv)",
+              f"- Seções com RDV recontado: {len(rdv)}",
+              *[f"- Seções com certificado de urna emitido pela {nome}: {sum(s['ac_certificado'] == nome for s in secoes)}"
+                for nome in assinatura.carrega_acs()],
               "", "## Divergências", "", "| tipo | quantidade |", "|---|---|"]
     linhas += [f"| {t} | {n} |" for t, n in tipos.most_common()] or ["| (nenhuma) | 0 |"]
     linhas += ["", "## Votos por horário (Brasília, sem exterior)", "",

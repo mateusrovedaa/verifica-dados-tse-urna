@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import assinatura as A
 
 acs = A.carrega_acs()
-print("ACs", {k: v[0] for k, v in acs.items()})
+print("ACs", {k: (v["alg"], v["inicio"], v["fim"]) for k, v in acs.items()})
 for vsc in sorted(glob.glob("amostra/*-vota.vsc")):
     sec = vsc.removesuffix("-vota.vsc")
     arqs = {os.path.basename(f): open(f, "rb").read() for f in glob.glob(sec + "-*")}
@@ -23,3 +23,16 @@ s = next(s for n, _, s in A.le_entidade(vsc, A.filhos(vsc, A.elemento(vsc, 0))[1
 i = vsc.find(s) + 10
 assert A.verifica_vsc(vsc[:i] + bytes([vsc[i] ^ 1]) + vsc[i + 1:], arqs, acs)["assinatura_falha"] == [bu]
 print("adulterações detectadas: ok")
+
+# pontos de ordem pequena (0, -1) e (1, 0) não são aceitos como chave Ed521; a chave de uma urna real é
+ordem_pequena = [(A.P - 1).to_bytes(66, "little"), (0).to_bytes(66, "little")]
+assert not any(A.ed_no_subgrupo(k) for k in ordem_pequena)
+cert = A.le_certificado(open("acs/acue2022.der", "rb").read())
+assert cert["alg"] == "ed521" and A.ed_no_subgrupo(cert["chave"])
+# DER truncado é recusado em vez de lido pela metade
+try:
+    A.filhos(vsc[:1000], A.elemento(vsc[:1000], 0))
+    raise AssertionError("DER truncado aceito")
+except ValueError:
+    pass
+print("ordem pequena e DER truncado recusados: ok")
