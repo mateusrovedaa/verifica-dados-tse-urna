@@ -1,0 +1,30 @@
+--- spec/assinatura-tse-v2.asn1	2026-10-29 00:02:40
++++ spec/assinatura-2026.asn1	2026-10-29 00:02:40
+@@ -45,18 +45,23 @@
+     versao                  INTEGER (2..99999999),              -- Versao do protocolo (alterações devem gerar novo valor. Nas eleições de 2012 foi utilizado o enumerado de valor 1, a partir de 2014 utilizar o valor 2).
+     autoAssinado            AutoAssinaturaDigital,              -- Informações da auto assinatura digital.
+     conteudoAutoAssinado    OCTET STRING,                       -- Conteúdo da assinatura do próprio arquivo.
+-    certificadoDigital      OCTET STRING OPTIONAL,              -- Certificado digital da urna eletrônica.
+-    conjuntoChave           GeneralString(SIZE(1..15)) OPTIONAL -- Identificador do conjunto de chaves usado para assinar o pacote.
++    conjuntoChave       [0] GeneralString(SIZE(1..15)) OPTIONAL, -- AJUSTE 2026: tag [0], antes do certificado.
++    certificadoDigital  [1] OCTET STRING OPTIONAL                -- AJUSTE 2026: tag [1].
+ }
+ 
+ -- Entidade responsável por gerar o arquivo de assinaturas de sistemas do ecossistema da urna.
+ -- Podendo ter dois tipos de assinatura (hardware (HW) e software (SW)).
+ EntidadeAssinaturaEcourna ::= SEQUENCE {
+-    modeloEquipamento   ModeloEquipamento,  -- Modelo da máquina que gerou a assinatura.
+     assinaturaSW        EntidadeAssinatura, -- Assinatura realizada via software (normalmente CEPESC).
+-    assinaturaHW        EntidadeAssinatura  -- Assinatura realizada via hardware da máquina.
++    assinaturaHW        EntidadeAssinatura, -- Assinatura realizada via hardware da máquina.
++    equipamento         InfoEquipamento     -- AJUSTE 2026: modelo vem no final, junto com o algoritmo.
+ }
+ 
++InfoEquipamento ::= SEQUENCE {              -- AJUSTE 2026
++    modeloEquipamento   ModeloEquipamento,
++    algoritmo           AlgoritmoAssinatura
++}
++
+ -- Demais SEQUENCES
+ -- Informações do algoritmo de assinatura .
+ AlgoritmoAssinaturaInfo ::= SEQUENCE {

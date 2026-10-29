@@ -1,0 +1,70 @@
+uf,secao,tipo,detalhe
+BA,o03221ba3471100210178,votos no log diferente do comparecimento no BU,log=233 bu=234
+BA,o03221ba3565301730235,votos no log diferente do comparecimento no BU,log=204 bu=217
+BA,o03221ba3987001330184,votos no log diferente do comparecimento no BU,log=413 bu=228
+ES,o03221es5793200090085,votos no log diferente do comparecimento no BU,log=612 bu=308
+MA,o03221ma0889300470609,votos no log diferente do comparecimento no BU,log=188 bu=224
+MG,o03221mg4069000160264,votos no log diferente do comparecimento no BU,log=160 bu=114
+PB,o03221pb2175000020254,votos no log diferente do comparecimento no BU,log=303 bu=304
+PI,o03221pi1153300030216,votos no log diferente do comparecimento no BU,log=258 bu=259
+RS,o03221rs8906000170191,votos no log diferente do comparecimento no BU,log=90 bu=92
+SP,o03221sp6477703950298,problemas,sem log
+SP,o03221sp6477703950298,votos no log diferente do comparecimento no BU,log=0 bu=268
+ZZ,o03221zz2917300010494,BU inconsistente,PRESIDENTE: soma=13 apurado=13 comparecimento=
+ZZ,o03221zz2917300010494,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2925400010001,BU inconsistente,PRESIDENTE: soma=53 apurado=53 comparecimento=
+ZZ,o03221zz2925400010001,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2927000010003,BU inconsistente,PRESIDENTE: soma=14 apurado=14 comparecimento=
+ZZ,o03221zz2927000010003,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2929700010495,BU inconsistente,PRESIDENTE: soma=39 apurado=39 comparecimento=
+ZZ,o03221zz2929700010495,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2930000010006,BU inconsistente,PRESIDENTE: soma=29 apurado=29 comparecimento=
+ZZ,o03221zz2930000010006,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2939400010028,BU inconsistente,PRESIDENTE: soma=41 apurado=41 comparecimento=
+ZZ,o03221zz2939400010028,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2956400010091,BU publicado sem seção no resultado oficial,
+ZZ,o03221zz2956400010091,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2958000010096,BU inconsistente,PRESIDENTE: soma=31 apurado=31 comparecimento=
+ZZ,o03221zz2958000010096,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2964500010380,BU inconsistente,PRESIDENTE: soma=52 apurado=52 comparecimento=
+ZZ,o03221zz2964500010380,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2975000011703,BU inconsistente,PRESIDENTE: soma=34 apurado=34 comparecimento=
+ZZ,o03221zz2975000011703,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2977700010127,BU inconsistente,PRESIDENTE: soma=45 apurado=45 comparecimento=
+ZZ,o03221zz2977700010127,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2985800011183,BU inconsistente,PRESIDENTE: soma=21 apurado=21 comparecimento=
+ZZ,o03221zz2985800011183,problemas,BU impresso sem comparecimento
+ZZ,o03221zz2991200010150,BU inconsistente,PRESIDENTE: soma=37 apurado=37 comparecimento=
+ZZ,o03221zz2991200010150,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3016300010647,BU inconsistente,PRESIDENTE: soma=97 apurado=97 comparecimento=
+ZZ,o03221zz3016300010647,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3017100011340,BU inconsistente,PRESIDENTE: soma=10 apurado=10 comparecimento=
+ZZ,o03221zz3017100011340,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3029500010348,BU inconsistente,PRESIDENTE: soma=7 apurado=7 comparecimento=
+ZZ,o03221zz3029500010348,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3032500010352,BU inconsistente,PRESIDENTE: soma=24 apurado=24 comparecimento=
+ZZ,o03221zz3032500010352,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3033300010353,BU inconsistente,PRESIDENTE: soma=8 apurado=8 comparecimento=
+ZZ,o03221zz3033300010353,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3043000010384,BU inconsistente,PRESIDENTE: soma=23 apurado=23 comparecimento=
+ZZ,o03221zz3043000010384,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3054600011764,BU inconsistente,PRESIDENTE: soma=55 apurado=55 comparecimento=
+ZZ,o03221zz3054600011764,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3059700011182,BU inconsistente,PRESIDENTE: soma=28 apurado=28 comparecimento=
+ZZ,o03221zz3059700011182,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3068600010443,BU publicado sem seção no resultado oficial,
+ZZ,o03221zz3068600010443,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3070800010444,BU inconsistente,PRESIDENTE: soma=23 apurado=23 comparecimento=
+ZZ,o03221zz3070800010444,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3082100011524,BU inconsistente,PRESIDENTE: soma=12 apurado=12 comparecimento=
+ZZ,o03221zz3082100011524,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3896200010558,BU inconsistente,PRESIDENTE: soma=17 apurado=17 comparecimento=
+ZZ,o03221zz3896200010558,problemas,BU impresso sem comparecimento
+ZZ,o03221zz3910200010712,BU inconsistente,PRESIDENTE: soma=34 apurado=34 comparecimento=
+ZZ,o03221zz3910200010712,problemas,BU impresso sem comparecimento
+ZZ,o03221zz9915500011504,BU inconsistente,PRESIDENTE: soma=20 apurado=20 comparecimento=
+ZZ,o03221zz9915500011504,problemas,BU impresso sem comparecimento
+ZZ,o03221zz9918000011228,BU inconsistente,PRESIDENTE: soma=22 apurado=22 comparecimento=
+ZZ,o03221zz9918000011228,problemas,BU impresso sem comparecimento
+ZZ,o03221zz9947300011327,BU inconsistente,PRESIDENTE: soma=42 apurado=42 comparecimento=
+ZZ,o03221zz9947300011327,problemas,BU impresso sem comparecimento
