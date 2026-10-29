@@ -1,9 +1,10 @@
 # Casos investigados
 
 Todas as divergências de `divergencias.csv` foram abertas uma a uma. Para isso, os arquivos de cada seção
-foram baixados de novo do zip do TSE, lendo só os trechos necessários (HTTP Range). Nenhum caso afeta
-os totais de presidente e governador, que batem voto a voto com o resultado oficial, nem a contagem de
-votos a partir das 17h e das 19h.
+foram baixados de novo do zip do TSE, lendo só os trechos necessários (HTTP Range). Nenhum caso afeta os
+totais de presidente e governador, que batem voto a voto com o resultado oficial, nem a contagem de votos a
+partir das 17h. Os três pacotes com log a mais (abaixo) fazem o total de votos no log do Brasil ficar
+213 acima do comparecimento dos BUs (0,0002%), nas faixas antes das 17h.
 
 ## Assinatura digital
 
@@ -53,7 +54,7 @@ O BU confere com o resultado oficial.
 
 Nos três primeiros casos, a contagem do log fica **maior** que o BU porque `processa.py` soma todos os logs
 do pacote. Isso é proposital: a regra é extrair sem interpretar, e assim a anomalia do pacote aparece.
-Os votos excedentes desses três casos são todos anteriores às 17h de Brasília.
+Os votos excedentes desses três casos são todos anteriores às 17h de Brasília. Somados aos casos com log a menos, o saldo é de 213 votos a mais no log do que no BU.
 
 ## Arquivos fora do padrão nos zips
 
